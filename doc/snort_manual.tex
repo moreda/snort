@@ -12798,7 +12798,7 @@ only 1 file.
 \subsubsection{Format}
 
 \begin{verbatim}
-    output alert_fast: [<filename> ["packet"] [<limit>]]
+    output alert_fast: [<filename> ["packet"|"packetraw"] [<limit>]]
     <limit> ::= <number>[('G'|'M'|K')]
 \end{verbatim}
 
@@ -12810,6 +12810,10 @@ include an absolute or relative path.
 \item \texttt{packet}: this option will cause multiline entries with full
 packet headers to be logged.  By default, only brief single-line entries are
 logged.
+
+\item \texttt{packetraw}: this option will cause brief single-line entries
+to be logged with the content of the packet in raw format (ascii and hexadecimal
+dumps) appended.
 
 \item \texttt{limit}: an optional limit on file size which defaults to 128 MB.  
 The minimum is 1 KB.  See \ref{Log Limits} for more information.

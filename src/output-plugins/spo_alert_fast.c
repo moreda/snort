@@ -92,6 +92,7 @@ typedef struct _SpoAlertFastData
 {
     TextLog* log;
     uint8_t packet_flag;
+    uint8_t packetraw_flag;
 } SpoAlertFastData;
 
 static void AlertFastInit(struct _SnortConfig *, char *);
@@ -211,6 +212,15 @@ static void AlertFast(Packet *p, const char *msg, void *arg, Event *event)
         LogIpAddrs(data->log, p);
     }
 
+    if(p && data->packetraw_flag)
+    {
+        char *aschex_packetraw;
+        aschex_packetraw = (char *)aschex(p->pkt,p->pkth->caplen);
+        TextLog_Puts(data->log, " ");
+        TextLog_Puts(data->log, aschex_packetraw);
+        free(aschex_packetraw);
+    }
+
     if(p && data->packet_flag)
     {
         /* Log whether or not this is reassembled data - only indicate
@@ -312,6 +322,12 @@ static SpoAlertFastData *ParseAlertFastArgs(struct _SnortConfig *sc, char *args)
                     bufSize = FULL_BUF;
                     break;
                 }
+                else if ( !strcasecmp("packetraw", tok) )
+                {
+                    data->packetraw_flag = 1;
+                    bufSize = FULL_BUF;
+                    break;
+                }
                 /* in this case, only 2 options allowed */
                 else i++;
                 /* fall thru so "packet" is optional ... */
@@ -346,8 +362,8 @@ static SpoAlertFastData *ParseAlertFastArgs(struct _SnortConfig *sc, char *args)
 #endif
 
     DEBUG_WRAP(DebugMessage(
-        DEBUG_INIT, "alert_fast: '%s' %d %ld\n",
-        filename?filename:"alert", data->packet_flag, limit
+        DEBUG_INIT, "alert_fast: '%s' %d %d %ld\n",
+        filename?filename:"alert", data->packet_flag, data->packetraw_flag, limit
     ););
 
     if ((filename == NULL) && (sc->alert_file != NULL))

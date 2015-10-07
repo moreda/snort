@@ -230,6 +230,7 @@ int GetFilesUnderDir(const char *, SF_QUEUE *, const char *);
 ***********************************************************/
 char *hex(const u_char *, int);
 char *fasthex(const u_char *, int);
+char *aschex(const u_char *, int);
 int xatol(const char *, const char *);
 unsigned int xatou(const char *, const char *);
 unsigned int xatoup(const char *, const char *); // return > 0
