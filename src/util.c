@@ -2307,6 +2307,61 @@ char *fasthex(const u_char *xdata, int length)
     return retbuf;
 }
 
+/****************************************************************************
+ *
+ * Function: aschex(u_char *xdata, int length)
+ *
+ * Purpose: This function takes takes a buffer "xdata" and its length then
+ *          returns a string of ascii and hex values in "readable" form
+ *
+ * Arguments: xdata is the buffer, length is the length of the buffer in
+ *            bytes
+ *
+ * Returns: char * -- You must free this char * when you are done with it.
+ *
+ ***************************************************************************/
+char *aschex(const u_char *xdata, int length) {
+    char conv[] = "0123456789ABCDEF";
+    char *retbuf = NULL;
+    unsigned long retbuf_size;
+    char *asc_msg;
+    char *hex_msg;
+    const u_char *index;
+    char *ridx;
+
+    asc_msg = (char *)SnortAlloc(((length * 1) + 1) * sizeof(char));
+    hex_msg = (char *)SnortAlloc(((length * 2) + 1) * sizeof(char));
+    retbuf_size = ((length * 3) + 2) * sizeof(char);
+    retbuf = (char *)SnortAlloc(retbuf_size);
+
+    /* Obtain ascii msg */
+    index = xdata;
+    ridx = asc_msg;
+    while (index < xdata + length) {
+        if (*index > 0x20 && *index < 0x7F) *ridx++ = *index;
+        else *ridx++ = '.';
+        index++;
+    }
+
+    /* Obtain hex msg */
+    index = xdata;
+    ridx = hex_msg;
+    while (index < xdata + length) {
+        *ridx++ = conv[((*index & 0xFF)>>4)];
+        *ridx++ = conv[((*index & 0xFF)&0x0F)];
+        index++;
+    }
+
+    /* Concat asc and hex msgs */
+    snprintf(retbuf, retbuf_size, "%s %s", asc_msg, hex_msg);
+
+    /* Free local resources */
+    free(asc_msg);
+    free(hex_msg);
+
+    return retbuf;
+}
+
 /*
  *   Fatal Integer Parser
  *   Ascii to Integer conversion with fatal error support
